@@ -1,8 +1,6 @@
 package com.example.sfs.controller;
 
-import com.example.sfs.dto.product.GetCrawledProductsRequestDto;
-import com.example.sfs.dto.product.GetCrawledProductsResponseDto;
-import com.example.sfs.dto.product.PostCrawledProductsRequestDto;
+import com.example.sfs.dto.product.*;
 import com.example.sfs.service.ProductService;
 import lombok.RequiredArgsConstructor;
 
@@ -28,5 +26,15 @@ public class ProductController {
     @PostMapping("/crawler/products")
     public ResponseEntity<Void> saveCrawledProducts(@RequestBody List<PostCrawledProductsRequestDto> postCrawledProductsRequestDtos){
         return new ResponseEntity<>(productService.saveCrawledProducts(postCrawledProductsRequestDtos), HttpStatus.OK);
+    }
+
+    @GetMapping("/products")
+    public ResponseEntity<List<GetProductsResponseDto>> getProducts() {
+        return new ResponseEntity<>(productService.getProducts(), HttpStatus.OK);
+    }
+
+    @GetMapping("/products/{productId}")
+    public ResponseEntity<GetProductResponseDto> getProducts(@PathVariable Long productId) {
+        return new ResponseEntity<>(productService.getProduct(productId), HttpStatus.OK);
     }
 }

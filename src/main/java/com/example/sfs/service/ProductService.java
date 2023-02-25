@@ -1,9 +1,7 @@
 package com.example.sfs.service;
 
 import com.example.sfs.dto.crawler.ProductDto;
-import com.example.sfs.dto.product.GetCrawledProductsRequestDto;
-import com.example.sfs.dto.product.GetCrawledProductsResponseDto;
-import com.example.sfs.dto.product.PostCrawledProductsRequestDto;
+import com.example.sfs.dto.product.*;
 import com.example.sfs.model.Product;
 import com.example.sfs.repository.ProductRepository;
 import com.example.sfs.util.crawler.ProductCrawler;
@@ -68,5 +66,22 @@ public class ProductService {
         }
         productRepository.saveAll(products);
         return null;
+    }
+
+    public List<GetProductsResponseDto> getProducts() {
+        List<Product> products = productRepository.findAll();
+        List<GetProductsResponseDto> getProductsResponseDtos = new ArrayList<>();
+        for(Product product : products) {
+            getProductsResponseDtos.add(new GetProductsResponseDto(product));
+        }
+        return getProductsResponseDtos;
+    }
+
+    public GetProductResponseDto getProduct(Long productId) {
+        Product product = productRepository.findById(productId).get();
+        if(product == null) {
+            throw new IllegalArgumentException("상품 정보가 없습니다.");
+        }
+        return new GetProductResponseDto(product);
     }
 }
