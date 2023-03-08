@@ -8,6 +8,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.io.IOException;
 import java.util.List;
 
 @RestController
@@ -24,17 +25,22 @@ public class ProductController {
     }
 
     @PostMapping("/crawler/products")
-    public ResponseEntity<Void> saveCrawledProducts(@RequestBody List<PostCrawledProductsRequestDto> postCrawledProductsRequestDtos){
-        return new ResponseEntity<>(productService.saveCrawledProducts(postCrawledProductsRequestDtos), HttpStatus.OK);
+    public ResponseEntity<Void> saveCrawledProducts(@RequestBody List<PostCrawledProductsRequestDto> postCrawledProductsRequestDtos) throws IOException {
+        return new ResponseEntity(productService.saveCrawledProducts(postCrawledProductsRequestDtos), HttpStatus.OK);
     }
 
     @GetMapping("/products")
     public ResponseEntity<List<GetProductsResponseDto>> getProducts() {
-        return new ResponseEntity<>(productService.getProducts(), HttpStatus.OK);
+        return new ResponseEntity(productService.getProducts(), HttpStatus.OK);
     }
 
     @GetMapping("/products/{productId}")
-    public ResponseEntity<GetProductResponseDto> getProducts(@PathVariable Long productId) {
-        return new ResponseEntity<>(productService.getProduct(productId), HttpStatus.OK);
+    public ResponseEntity<GetProductResponseDto>getProduct(@PathVariable Long productId) {
+        return new ResponseEntity(productService.getProduct(productId), HttpStatus.OK);
+    }
+
+    @PostMapping("/products/{productId}")
+    public ResponseEntity<Void> registerProduct(@PathVariable Long productId, @RequestBody PostRegisterProductRequestDto postRegisterProductRequestDto) {
+        return new ResponseEntity(productService.registerProduct(productId, postRegisterProductRequestDto), HttpStatus.OK);
     }
 }

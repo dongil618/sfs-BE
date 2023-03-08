@@ -10,5 +10,5 @@ import lombok.NoArgsConstructor;
 public class GetCrawledProductsResponseDto {
     private String productName;
     private String detailPageUrl;
-    private String thumbnailImageUrl;
+    private String thumbnailImage;
 }
