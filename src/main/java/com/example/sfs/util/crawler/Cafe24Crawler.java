@@ -57,6 +57,12 @@ public class Cafe24Crawler implements ProductCrawler {
         }
     }
 
+    /**
+     * 상품 썸네일, 이름, 디테일 페이지 URL, 썸네일 URL 가져오기
+     * @param url
+     * @param pageNum
+     * @return
+     */
     @Override
     public List<ProductDto> getProductThumbInfos(String url, Integer pageNum) {
         List<ProductDto> productDtos = new ArrayList<>();

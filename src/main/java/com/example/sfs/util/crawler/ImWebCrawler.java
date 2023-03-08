@@ -26,6 +26,6 @@ public class ImWebCrawler implements ProductCrawler {
 
     @Override
     public ProductCrawlerStrategy getProductCrawlerStrategy() {
-        return null;
+        return ProductCrawlerStrategy.ImWebCrawler;
     }
 }

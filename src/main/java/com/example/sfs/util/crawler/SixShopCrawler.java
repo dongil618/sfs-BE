@@ -25,6 +25,6 @@ public class SixShopCrawler implements ProductCrawler {
 
     @Override
     public ProductCrawlerStrategy getProductCrawlerStrategy() {
-        return null;
+        return ProductCrawlerStrategy.SixShopCrawler;
     }
 }
