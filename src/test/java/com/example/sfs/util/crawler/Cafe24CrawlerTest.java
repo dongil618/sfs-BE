@@ -1,10 +1,7 @@
-package com.example.sfs.util;
+package com.example.sfs.util.crawler;
 
 import com.example.sfs.dto.product.PostCrawledProductsRequestDto;
-import com.example.sfs.util.crawler.Cafe24Crawler;
 import com.example.sfs.dto.crawler.ProductDto;
-import com.example.sfs.util.crawler.CategoryCrawler;
-import com.example.sfs.util.crawler.ProductCrawlerStrategy;
 import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -23,7 +20,7 @@ public class Cafe24CrawlerTest {
         List<ProductDto> productDtos = new Cafe24Crawler(new CategoryCrawler()).getProductDetailInfos(url);
 
         // then
-        //Assertions.assertThat(productDtos.size()).isEqualTo(40);
+        Assertions.assertThat(productDtos.size()).isEqualTo(30);
     }
 
     @Test
