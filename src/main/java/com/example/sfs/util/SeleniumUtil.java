@@ -87,6 +87,14 @@ public class SeleniumUtil {
         timeSleep(2);
     }
 
+    public void executeClickJsBySelector(WebDriver driver, String cssSelector) throws InterruptedException {
+        WebElement element = getPresenceOfElementBySelector(driver, cssSelector);
+        JavascriptExecutor executor = (JavascriptExecutor) driver;
+        executor.executeScript("arguments[0].click();", element);
+        timeSleep(2);
+    }
+
+
     public void scrollTo(WebDriver driver, int x, int y) {
         JavascriptExecutor js = (JavascriptExecutor) driver;
         String script = "window.scrollBy(" + x + "," + y + ")";
@@ -133,7 +141,14 @@ public class SeleniumUtil {
         return element;
     }
 
+    public WebElement getPresenceOfElementBySelector(WebDriver driver, String cssSelector) {
+        WebElement element = new WebDriverWait(driver, 10)
+                .until(ExpectedConditions.presenceOfElementLocated(By.cssSelector(cssSelector)));
+        return  element;
+    }
+
     public void clipboardCopyString(String copyString) {
+        System.setProperty("java.awt.headless", "false");
         Clipboard clipboard = Toolkit.getDefaultToolkit().getSystemClipboard();
         if(copyString != null)
         {

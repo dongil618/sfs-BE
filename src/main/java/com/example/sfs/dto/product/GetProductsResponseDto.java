@@ -1,5 +1,6 @@
 package com.example.sfs.dto.product;
 
+import com.example.sfs.config.CommonConfig;
 import com.example.sfs.dto.crawler.ProductDto;
 import com.example.sfs.model.Product;
 import lombok.AllArgsConstructor;
@@ -17,7 +18,7 @@ public class GetProductsResponseDto {
     public GetProductsResponseDto(Product product) {
         this.productId = product.getProductId();
         this.productName = product.getName();
-        this.thumbnailImageUrl = product.getThumbnailImageUrl();
+        this.thumbnailImageUrl = CommonConfig.BASE_IMAGE_URL + "/" + productName + "/" + product.getThumbnailImageName();
         this.detailPageUrl = product.getDetailPageUrl();
     }
 }

@@ -19,7 +19,7 @@ public class SixShopCrawler implements ProductCrawler {
     }
 
     @Override
-    public List<ProductDto> getProductThumbInfos(String url, Integer pageNum) {
+    public List<ProductDto> getProductThumbInfos(String siteUrl, Integer pageNum) {
         return null;
     }
 
