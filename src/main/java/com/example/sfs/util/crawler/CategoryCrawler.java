@@ -31,7 +31,7 @@ public class CategoryCrawler {
                 String productCategory = "";
                 Elements categoryElements = categoryDiv.getElementsByTag("span");
                 for(Element categoryElement : categoryElements) {
-                    productCategory += (categoryElement.text() + "/");
+                    productCategory += (categoryElement.text() + "$");
                 }
                 productCategory = productCategory.substring(0, productCategory.length() - 1);
                 productCategoryList.add(productCategory);

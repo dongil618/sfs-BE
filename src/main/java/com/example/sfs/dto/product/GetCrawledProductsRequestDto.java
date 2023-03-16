@@ -9,7 +9,7 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @AllArgsConstructor
 public class GetCrawledProductsRequestDto {
-    private String url;
+    private String siteUrl;
     private Integer pageNum;
     private ProductCrawlerStrategy siteType; // 0: cafe24, 1: imweb, 2: sixshop
 }

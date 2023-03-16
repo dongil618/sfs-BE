@@ -8,6 +8,6 @@ import java.util.List;
 public interface ProductCrawler {
     public List<ProductDto> getProductDetailInfos(String url);
     public ProductDto getProductDetailInfo(PostCrawledProductsRequestDto postCrawledProductsRequestDto);
-    public List<ProductDto> getProductThumbInfos(String url, Integer pageNum);
+    public List<ProductDto> getProductThumbInfos(String siteUrl, Integer pageNum);
     ProductCrawlerStrategy getProductCrawlerStrategy();
 }

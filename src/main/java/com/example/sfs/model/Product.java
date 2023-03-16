@@ -19,15 +19,16 @@ public class Product {
     private Long productId;
     private String name;
     private String detailPageUrl;
-    private String thumbnailImageUrl;
+    private String thumbnailImageName;
     private String category;
     private Integer price;
     private String discountYN;
     private Integer discountedAmount;
     @Column(length = 10000)
-    private String detailImageUrlList;
+    private String detailImageNameList;
     private String sizeList;
     private String colorList;
+    @Column(length = 10000)
     private String instruction;
     private String sizeGuide;
 
@@ -35,12 +36,12 @@ public class Product {
     public Product(ProductDto productDto) {
         this.name = productDto.getName();
         this.detailPageUrl = productDto.getDetailPageUrl();
-        this.thumbnailImageUrl = productDto.getThumbnailImageUrl();
+        this.thumbnailImageName = productDto.getThumbnailImageUrl();
         this.category = productDto.getCategory();
         this.price = productDto.getPrice();
         this.discountYN = productDto.getDiscountYN();
         this.discountedAmount = productDto.getDiscountedAmount();
-        this.detailImageUrlList = setListToStringComma(productDto.getDetailImageUrlList());
+        this.detailImageNameList = setListToStringDollar(productDto.getDetailImageUrlList());
         this.sizeList = setListToStringComma(productDto.getSizeList());
         this.colorList = setListToStringComma(productDto.getColorList());
         this.instruction = productDto.getInstruction();
@@ -53,4 +54,12 @@ public class Product {
         }
         return null;
     }
+
+    public String setListToStringDollar(List<String> stringList) {
+        if(stringList != null) {
+            return String.join("$", stringList);
+        }
+        return null;
+    }
+
 }

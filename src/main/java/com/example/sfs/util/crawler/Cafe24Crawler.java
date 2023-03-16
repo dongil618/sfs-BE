@@ -22,10 +22,10 @@ public class Cafe24Crawler implements ProductCrawler {
 
     private final CategoryCrawler categoryCrawler;
     @Override
-    public List<ProductDto> getProductDetailInfos(String url) {
+    public List<ProductDto> getProductDetailInfos(String siteUrl) {
         Integer pageNum = 1;
-        List<ProductDto> productDtos = getProductThumbInfos(url, pageNum);
-        String baseUrl = url.split("/")[0] + "//" + url.split("/")[2];
+        List<ProductDto> productDtos = getProductThumbInfos(siteUrl, pageNum);
+        String baseUrl = siteUrl.split("/")[0] + "//" + siteUrl.split("/")[2];
 
         for(ProductDto productDto: productDtos) {
             setProductDto(baseUrl, productDto);
@@ -116,7 +116,7 @@ public class Cafe24Crawler implements ProductCrawler {
                 productDto.setSizeList(optionList);
             }
 
-            String[] colorArray = {"컬러", "Color", "Color", "color"};
+            String[] colorArray = {"컬러", "Color", "COLOR", "color"};
             List<String> colorList = new ArrayList<>(Arrays.asList(colorArray));
             if(colorList.contains(optionName)){
                 productDto.setSizeList(optionList);
