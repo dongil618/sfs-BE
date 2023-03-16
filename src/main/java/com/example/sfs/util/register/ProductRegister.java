@@ -4,7 +4,7 @@ import com.example.sfs.dto.product.PostRegisterProductRequestDto;
 
 public interface ProductRegister {
 
-    void registerProduct(PostRegisterProductRequestDto postRegisterProductRequestDto);
+    void registerProduct(PostRegisterProductRequestDto postRegisterProductRequestDto) throws Exception;
     ProductRegisterStrategy getProductRegisterStrategy();
 
 }

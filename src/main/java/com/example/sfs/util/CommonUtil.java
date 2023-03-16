@@ -118,7 +118,7 @@ public class CommonUtil {
     }
 
     /**
-     * db에 콤마(,)로 구분된 것을 리스트로 변경해줌 -> 해당 부분은 DB 구조 변경 시 수정해야함.
+     * db에 달러($)로 구분된 것을 리스트로 변경해줌 -> 해당 부분은 DB 구조 변경 시 수정해야함.
      * @param postRegisterProductRequestDto
      * @return
      */

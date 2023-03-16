@@ -7,8 +7,8 @@ import lombok.NoArgsConstructor;
 @Getter
 @NoArgsConstructor
 @AllArgsConstructor
-public class GetCrawledProductsResponseDto {
+public class SaveCrawledProductsResponseDto {
+    private Long productId;
     private String productName;
-    private String detailPageUrl;
     private String thumbnailImageUrl;
 }

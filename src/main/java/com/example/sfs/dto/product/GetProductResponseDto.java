@@ -10,12 +10,12 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 public class GetProductResponseDto {
     private String productName;
-    private String thumbnailImageUrl;
+    private String thumbnailImageName;
     private String category;
     private Integer price;
     private String discountYN;
     private Integer discountedAmount;
-    private String detailImageUrlList;
+    private String detailImageNameList;
     private String sizeList;
     private String colorList;
     private String instruction;
@@ -23,11 +23,12 @@ public class GetProductResponseDto {
 
     public GetProductResponseDto(Product product) {
         this.productName = product.getName();
-        this.thumbnailImageUrl = product.getThumbnailImageUrl();
+        this.thumbnailImageName = product.getThumbnailImageName();
         this.category = product.getCategory();
         this.price = product.getPrice();
         this.discountYN = product.getDiscountYN();
         this.discountedAmount = product.getDiscountedAmount();
+        this.detailImageNameList = product.getDetailImageNameList();
         this.sizeList = product.getSizeList();
         this.colorList = product.getColorList();
         this.instruction = product.getInstruction();

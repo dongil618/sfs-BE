@@ -2,17 +2,17 @@ package com.example.sfs.util.register;
 
 import com.example.sfs.dto.product.PostRegisterProductRequestDto;
 import com.example.sfs.util.CommonUtil;
-import com.example.sfs.util.MacroUtil;
 import com.example.sfs.util.PropertiesLoader;
+import com.example.sfs.config.ChromeDriverContext;
 import com.example.sfs.util.SeleniumUtil;
 
-import io.github.bonigarcia.wdm.WebDriverManager;
-
+import org.jsoup.Jsoup;
+import org.jsoup.nodes.Document;
+import org.jsoup.select.Elements;
 import org.openqa.selenium.*;
-import org.openqa.selenium.chrome.ChromeDriver;
-import org.openqa.selenium.chrome.ChromeOptions;
 import org.springframework.stereotype.Component;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -20,31 +20,34 @@ import java.util.Properties;
 
 @Component
 public class SmartStoreRegister implements ProductRegister {
-    private static WebDriver driver;
-    private static SeleniumUtil seleniumUtil;
-    public SmartStoreRegister(SeleniumUtil seleniumUtil) {
-        // 크롬 드라이버 자동 설치
-        WebDriverManager.chromedriver().setup();
+    private SeleniumUtil seleniumUtil;
+    private ChromeDriverContext context;
 
-        // 드라이버 셋업
-        ChromeOptions options = new ChromeOptions();
-        options.addArguments("--start-maximized");          // 최대크기로
-//        options.addArguments("--headless");                 // Browser를 띄우지 않음
-        options.addArguments("--disable-gpu");              // GPU를 사용하지 않음, Linux에서 headless를 사용하는 경우 필요함.
-        options.addArguments("--no-sandbox");               // Sandbox 프로세스를 사용하지 않음, Linux에서 headless를 사용하는 경우 필요함.
-        options.addArguments("--disable-popup-blocking");    // 팝업 무시
-        options.addArguments("--disable-default-apps");     // 기본앱 사용안함
+    private WebDriver driver;
 
-        this.driver = new ChromeDriver(options);
+    public SmartStoreRegister(SeleniumUtil seleniumUtil, ChromeDriverContext context) throws IOException {
         this.seleniumUtil = seleniumUtil;
+        this.context = context;
+        this.driver = context.setupChromeDriver();
     }
 
     @Override
-    public void registerProduct(PostRegisterProductRequestDto postRegisterProductRequestDto) {
-        smartStoreLogin(driver);
+    public void registerProduct(PostRegisterProductRequestDto postRegisterProductRequestDto) throws InterruptedException {
+        // 바로 상품 등록 url로 접근
         String createProductUrl = "https://sell.smartstore.naver.com/#/products/create";
-        try {
+        driver.get(createProductUrl);
+
+        String pageSource = driver.getPageSource();
+        Document doc = Jsoup.parse(pageSource);
+        String loginSelector = "#root > div > div.Layout_wrap__3uDBh > div > div > h2";
+        Elements loginSectionElements = doc.select(loginSelector);
+        System.out.println(loginSectionElements.text());
+        if(loginSectionElements.text().equals("로그인")) {
+            smartStoreLogin(driver);
             driver.get(createProductUrl);
+        }
+
+        try {
             seleniumUtil.timeSleep(5);
             closePopUp(driver);
             inputCategory(driver, postRegisterProductRequestDto);
@@ -68,10 +71,9 @@ public class SmartStoreRegister implements ProductRegister {
             seleniumUtil.timeSleep(1);
             stopDisplay(driver);
             saveRegisterProduct(driver);
-            seleniumUtil.timeSleep(10);
-            driver.quit();
-        } catch (Exception e) {
+        } catch (TimeoutException e) {
             e.printStackTrace();
+            throw new IllegalArgumentException(e);
         }
     }
 
@@ -90,6 +92,7 @@ public class SmartStoreRegister implements ProductRegister {
             driver.get(LoginUrlPath);
 
             SeleniumUtil seleniumUtil = new SeleniumUtil();
+
             // 네이버아이디로 로그인 버튼 클릭
             String naverLoginBtnXpath = "//*[@id='root']/div/div[1]/div/div/div[4]/div[1]/ul/li[2]/button/span";
             seleniumUtil.elementClickByXpath(driver, naverLoginBtnXpath);
@@ -105,27 +108,35 @@ public class SmartStoreRegister implements ProductRegister {
             String newWindowLoginBtnId = "log.login";
             seleniumUtil.elementClickById(driver, newWindowLoginBtnId);
             seleniumUtil.switchWindow(driver, 0);
-            seleniumUtil.findElementById(driver,"seller-lnb", 30);  // 2차 인증이 있다면 기다려줘야하기 때문에 인증 후 스마트스토어 판매자 센터 홈화면의 id값이 나타날 때까지 기다려주기
+            seleniumUtil.findElementById(driver,"seller-lnb", 60);  // 2차 인증이 있다면 기다려줘야하기 때문에 인증 후 스마트스토어 판매자 센터 홈화면의 id값이 나타날 때까지 기다려주기
         } catch (Exception e) {
             e.printStackTrace();
         }
     }
 
     public void closePopUp(WebDriver driver) {
+        // popup 여부 확인
+        String pageSource = driver.getPageSource();
+        Document doc = Jsoup.parse(pageSource);
+        String popUpDivSelector = "#seller-content > div";
+        Elements popUpDivElements = doc.select(popUpDivSelector);
+        System.out.println(popUpDivElements.attr("role"));
+        if(!(popUpDivElements.attr("role").equals("dialog"))) {
+            return;
+        }
+
         // popup 태그 가져오기
-//        String popUpXpath1 = "/html/body/div[1]/div/div/div[3]/div[2]/div/label";
-        String popUpXpath2 = "//*[@id=\'seller-content\']/div/div/div/div[2]/div/div/label";
+        String popUpSelector = "#seller-content > div > div > div > div.modal-footer > div > div > label";
 
         try {
-//            seleniumUtil.executeJsByXpath(driver, popUpXpath1);
-            seleniumUtil.executeJsByXpath(driver, popUpXpath2);
+            seleniumUtil.executeClickJsBySelector(driver, popUpSelector);
         } catch (Exception e) {
             e.printStackTrace();
         }
     }
 
     public void inputCategory(WebDriver driver, PostRegisterProductRequestDto postRegisterProductRequestDto) throws InterruptedException {
-        List<String> categoryList = Arrays.asList(postRegisterProductRequestDto.getCategory().split("/"));
+        List<String> categoryList = Arrays.asList(postRegisterProductRequestDto.getCategory().split("\\$"));
         String categorySearchXpath = "//*[@id=\'productForm\']/ng-include/ui-view[3]/div/div[2]/div/div[1]/div/category-search/div[1]/div[1]/div/label[2]";
         seleniumUtil.elementClickByXpath(driver, categorySearchXpath);
         seleniumUtil.timeSleep(driver, 5);
@@ -141,6 +152,14 @@ public class SmartStoreRegister implements ProductRegister {
                 }
             }
             i++;
+        }
+        // KC인증 안전기준 팝업창
+        seleniumUtil.timeSleep(1);
+        String kcPopUpSelector = "body > div.modal.seller-layer-modal.fade.in > div > div > div.modal-footer > div > button";
+        try {
+            seleniumUtil.executeClickJsBySelector(driver, kcPopUpSelector);
+        } catch (Exception e) {
+            e.printStackTrace();
         }
     }
 
@@ -174,8 +193,8 @@ public class SmartStoreRegister implements ProductRegister {
         seleniumUtil.elementClickByXpath(driver, optionActiveBtnXpath);
 
         // 선택형 클릭
-        String choiceTypeBtnXpath = "//*[@id=\'productForm\']/ng-include/ui-view[11]/div/fieldset/div/div/div[2]/div[1]/div/div[2]/label[1]";
-        seleniumUtil.elementClickByXpath(driver, choiceTypeBtnXpath);
+        String choiceTypeBtnCssSelector = "#productForm > ng-include > ui-view:nth-child(11) > div > fieldset > div > div > div:nth-child(2) > div:nth-child(1) > div > div.seller-input.fix-min-width.form-group > label:nth-child(1)";
+        seleniumUtil.elementClickByCssSelector(driver, choiceTypeBtnCssSelector);
     }
 
     // 함수가 너무 길다 -> 나중에 리팩토링 할 것! 특히 +버튼 눌렀을 때 옵션 추가되는 흐름으로 리팩토링하면 좋을 듯
@@ -302,7 +321,7 @@ public class SmartStoreRegister implements ProductRegister {
         seleniumUtil.elementClickByXpath(driver, pTagIdSizeNextXpath);
         String sizeGuide = postRegisterProductRequestDto.getSizeGuide();
         seleniumUtil.clipboardCopyString(sizeGuide);
-        MacroUtil.ctrlV();
+        seleniumUtil.performCtrlV(driver);
         seleniumUtil.timeSleep(1);
 
 
@@ -312,7 +331,7 @@ public class SmartStoreRegister implements ProductRegister {
         seleniumUtil.elementClickByXpath(driver, pTagIdCommentNextXpath);
         String instruction = postRegisterProductRequestDto.getInstruction();
         seleniumUtil.clipboardCopyString(instruction);
-        MacroUtil.ctrlV();
+        seleniumUtil.performCtrlV(driver);
         seleniumUtil.timeSleep(1);
 
         // 상세 페이지 이미지 등록
@@ -352,14 +371,18 @@ public class SmartStoreRegister implements ProductRegister {
         seleniumUtil.getPresenceOfElementByXpath(driver, stopDisplayBtnXpath).click();
     }
 
-    public void saveRegisterProduct(WebDriver driver) {
+    public void saveRegisterProduct(WebDriver driver) throws InterruptedException {
         String saveBtnXpath = "//*[@id=\'seller-content\']/ui-view/div[3]/div[2]/div[1]/button[3]";
-        seleniumUtil.elementClickByXpath(driver, saveBtnXpath);  // test 해봐야함
-
+        seleniumUtil.elementClickByXpath(driver, saveBtnXpath);
         String nextBtnXpath = "/html/body/div[1]/div/div/div[3]/div[1]/button[1]";
         seleniumUtil.elementClickByXpath(driver, nextBtnXpath);
+        seleniumUtil.timeSleep(5);
 
-        String manageProductBtnCssSelector = "body > div.modal.fade.seller-layer-modal.in > div > div > div.modal-footer > div > button.btn.btn-default";
-        seleniumUtil.elementClickByCssSelector(driver, manageProductBtnCssSelector);
+        String manageProductBtnSelector = "body > div.modal.fade.seller-layer-modal.in > div > div > div.modal-footer > div > button.btn.btn-default";
+        try {
+            seleniumUtil.executeClickJsBySelector(driver, manageProductBtnSelector);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
     }
 }

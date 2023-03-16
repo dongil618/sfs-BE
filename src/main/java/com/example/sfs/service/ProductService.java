@@ -8,7 +8,9 @@ import com.example.sfs.util.CommonUtil;
 import com.example.sfs.util.crawler.ProductCrawler;
 import com.example.sfs.util.crawler.ProductCrawlerStrategy;
 import com.example.sfs.util.crawler.ProductCrawlerStrategyFactory;
+import com.example.sfs.util.register.ProductRegister;
 import com.example.sfs.util.register.ProductRegisterStrategy;
+import com.example.sfs.util.register.ProductRegisterStrategyFactory;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -22,6 +24,7 @@ public class ProductService {
 
     private final ProductRepository productRepository;
     private final ProductCrawlerStrategyFactory productCrawlerStrategyFactory;
+    private final ProductRegisterStrategyFactory productRegisterStrategyFactory;
 
     /**
      * url을 통해 상품 크롤링해서 가져오기
@@ -29,7 +32,7 @@ public class ProductService {
      * @return
      */
     public List<GetCrawledProductsResponseDto> getCrawledProducts(GetCrawledProductsRequestDto crawledProductsRequestDto) {
-        String url = crawledProductsRequestDto.getUrl();
+        String siteUrl = crawledProductsRequestDto.getSiteUrl();
         Integer pageNum = crawledProductsRequestDto.getPageNum();
         ProductCrawlerStrategy siteType = crawledProductsRequestDto.getSiteType();
 
@@ -41,7 +44,7 @@ public class ProductService {
         }
 
         ProductCrawler productCrawlerStrategy = productCrawlerStrategyFactory.findStrategy(siteType);
-        List<ProductDto> productDtos = productCrawlerStrategy.getProductThumbInfos(url, pageNum);
+        List<ProductDto> productDtos = productCrawlerStrategy.getProductThumbInfos(siteUrl, pageNum);
 
         List<GetCrawledProductsResponseDto> crawledProductsResponseDtos = new ArrayList<>();
         for(ProductDto productDto : productDtos) {
@@ -100,7 +103,7 @@ public class ProductService {
         return new GetProductResponseDto(product);
     }
 
-    public Void registerProduct(Long productId, PostRegisterProductRequestDto postRegisterProductRequestDto) {
+    public Void registerProduct(Long productId, PostRegisterProductRequestDto postRegisterProductRequestDto) throws Exception {
         /* todo : productId로 조회 후 request와 다른 부분은 DB업데이트 및 상품 등록 진행 */
         ProductRegisterStrategy siteType = postRegisterProductRequestDto.getSiteType();
         if(siteType == null) {
@@ -108,6 +111,8 @@ public class ProductService {
         }
         // Product update => JPA 업데이트 사용법 알아보기
         // 셀레니움으로 상품 등록하기
+        ProductRegister productRegisterStrategy = productRegisterStrategyFactory.findStrategy(siteType);
+        productRegisterStrategy.registerProduct(postRegisterProductRequestDto);
         return null;
     }
 }
