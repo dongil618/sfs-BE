@@ -88,13 +88,10 @@ public class SmartStoreRegister implements ProductRegister {
             String naverId = properties.getProperty("NAVER_ID");
             String naverPw = properties.getProperty("NAVER_PW");
 
-            String LoginUrlPath = "https://accounts.commerce.naver.com/login?url=https%3A%2F%2Fsell.smartstore.naver.com%2F%23%2Flogin-callback";
-            driver.get(LoginUrlPath);
-
             SeleniumUtil seleniumUtil = new SeleniumUtil();
 
             // 네이버아이디로 로그인 버튼 클릭
-            String naverLoginBtnXpath = "//*[@id='root']/div/div[1]/div/div/div[4]/div[1]/ul/li[2]/button/span";
+            String naverLoginBtnXpath = "//*[@id='root']/div/div[1]/div/div/div[4]/div[1]/ul/li[2]/button";
             seleniumUtil.elementClickByXpath(driver, naverLoginBtnXpath);
             seleniumUtil.timeSleep(driver, 5);
 
@@ -202,8 +199,12 @@ public class SmartStoreRegister implements ProductRegister {
         String optionNameXpath = "//*[@id=\'choice_option_name0\']";
         String optionValuePath = "//*[@id=\'choice_option_value0\']";
 
-        if(postRegisterProductRequestDto.getColorList() != null && postRegisterProductRequestDto.getSizeList() != null) {
+        String colorList = postRegisterProductRequestDto.getColorList();
+        String sizeList = postRegisterProductRequestDto.getSizeList();
+        int divNum = 2;
+        if(colorList != null && sizeList != null) {
             // 옵션 개수 2개 선택
+            divNum = 3;
             String optionNumActiveBtnXpath = "//*[@id=\'productForm\']/ng-include/ui-view[11]/div/fieldset/div/div/div[2]/div[2]/div[2]/div/div/div/div/div[1]";
             seleniumUtil.elementClickByXpath(driver, optionNumActiveBtnXpath);
 
@@ -221,19 +222,19 @@ public class SmartStoreRegister implements ProductRegister {
             seleniumUtil.setInputDataByXpath(driver, optionNameXpath1, "size");
             seleniumUtil.setInputDataByXpath(driver, optionValuePath1, sizes);
         }
-        if(postRegisterProductRequestDto.getColorList() != null) {
+        if(colorList != null && sizeList == null) {
             String colors = postRegisterProductRequestDto.getColorList();
             seleniumUtil.setInputDataByXpath(driver, optionNameXpath, "color");
             seleniumUtil.setInputDataByXpath(driver, optionValuePath, colors);
         }
-        if(postRegisterProductRequestDto.getSizeList() != null) {
+        if(sizeList != null && colorList == null) {
             String sizes = postRegisterProductRequestDto.getSizeList();
             seleniumUtil.setInputDataByXpath(driver, optionNameXpath, "size");
             seleniumUtil.setInputDataByXpath(driver, optionValuePath, sizes);
         }
 
         // 옵션목록으로 적용하기 버튼 클릭
-        String applyOptionListBtnXpath = "//*[@id=\'productForm\']/ng-include/ui-view[11]/div/fieldset/div/div/div[2]/div[2]/div[4]/div/div/div[2]/div[1]/a";
+        String applyOptionListBtnXpath = "//*[@id=\'productForm\']/ng-include/ui-view[11]/div/fieldset/div/div/div[2]/div[2]/div[4]/div/div/div[" + divNum + "]/div[1]/a";
         seleniumUtil.elementClickByXpath(driver, applyOptionListBtnXpath);
     }
 
