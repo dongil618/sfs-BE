@@ -5,7 +5,6 @@ import com.example.sfs.dto.product.*;
 import com.example.sfs.service.ProductService;
 import lombok.RequiredArgsConstructor;
 
-import org.openqa.selenium.WebDriver;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -42,6 +41,9 @@ public class ProductController {
 
     @PostMapping("/products/{productId}")
     public ResponseEntity<Void> registerProduct(@PathVariable Long productId, @RequestBody PostRegisterProductRequestDto postRegisterProductRequestDto) throws Exception {
+        if(postRegisterProductRequestDto.getCategory() == null) {
+            throw new IllegalArgumentException("Category is null");
+        }
         return new ResponseEntity(productService.registerProduct(productId, postRegisterProductRequestDto), HttpStatus.OK);
     }
 }
