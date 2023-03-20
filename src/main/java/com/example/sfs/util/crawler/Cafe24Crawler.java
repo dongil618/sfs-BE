@@ -2,6 +2,7 @@ package com.example.sfs.util.crawler;
 
 import com.example.sfs.dto.crawler.ProductDto;
 import com.example.sfs.dto.product.PostCrawledProductsRequestDto;
+import com.example.sfs.util.api.PapagoApi;
 import lombok.RequiredArgsConstructor;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
@@ -21,6 +22,7 @@ import java.util.regex.Pattern;
 public class Cafe24Crawler implements ProductCrawler {
 
     private final CategoryCrawler categoryCrawler;
+    private final PapagoApi papagoApi;
     @Override
     public List<ProductDto> getProductDetailInfos(String siteUrl) {
         Integer pageNum = 1;
@@ -119,7 +121,7 @@ public class Cafe24Crawler implements ProductCrawler {
             String[] colorArray = {"컬러", "Color", "COLOR", "color"};
             List<String> colorList = new ArrayList<>(Arrays.asList(colorArray));
             if(colorList.contains(optionName)){
-                productDto.setSizeList(optionList);
+                productDto.setColorList(optionList);
             }
         }
     }
@@ -156,6 +158,10 @@ public class Cafe24Crawler implements ProductCrawler {
     }
     private void setProductCategory(ProductDto productDto) {
         String productName = productDto.getName();
+        String langCode = papagoApi.getLangCode(productName);
+        if(langCode.equals("en")) {
+            productName = papagoApi.changeEnToKor(productName);
+        }
         String productCategory = categoryCrawler.getProductCategory(productName);
         productDto.setCategory(productCategory);
     }
