@@ -2,6 +2,7 @@ package com.example.sfs.util.crawler;
 
 import com.example.sfs.dto.product.PostCrawledProductsRequestDto;
 import com.example.sfs.dto.crawler.ProductDto;
+import com.example.sfs.util.api.PapagoApi;
 import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -17,7 +18,7 @@ public class Cafe24CrawlerTest {
         String url = "https://ficelle.co.kr/category/new-in/24/";
 
         // when
-        List<ProductDto> productDtos = new Cafe24Crawler(new CategoryCrawler()).getProductDetailInfos(url);
+        List<ProductDto> productDtos = new Cafe24Crawler(new CategoryCrawler(), new PapagoApi()).getProductDetailInfos(url);
 
         // then
         Assertions.assertThat(productDtos.size()).isEqualTo(30);
@@ -35,7 +36,7 @@ public class Cafe24CrawlerTest {
         PostCrawledProductsRequestDto postCrawledProductsRequestDto = new PostCrawledProductsRequestDto(productName, detailPageUrl, thumbnailImageUrl, siteType);
 
         // when
-        ProductDto productDto = new Cafe24Crawler(new CategoryCrawler()).getProductDetailInfo(postCrawledProductsRequestDto);
+        ProductDto productDto = new Cafe24Crawler(new CategoryCrawler(), new PapagoApi()).getProductDetailInfo(postCrawledProductsRequestDto);
 
         // then
         Assertions.assertThat(productDto.getPrice()).isEqualTo(46000);
@@ -48,7 +49,7 @@ public class Cafe24CrawlerTest {
         String url = "https://www.ficelle.co.kr/category/shoes-bag-acc/34/";
 
         // when
-        List<ProductDto> productDtos = new Cafe24Crawler(new CategoryCrawler()).getProductThumbInfos(url, 1);
+        List<ProductDto> productDtos = new Cafe24Crawler(new CategoryCrawler(), new PapagoApi()).getProductThumbInfos(url, 1);
 
         // then
         Assertions.assertThat(productDtos.size()).isEqualTo(30);
