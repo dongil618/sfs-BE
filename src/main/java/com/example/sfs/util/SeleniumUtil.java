@@ -1,5 +1,8 @@
 package com.example.sfs.util;
 
+import org.jsoup.Jsoup;
+import org.jsoup.nodes.Document;
+import org.jsoup.select.Elements;
 import org.openqa.selenium.*;
 import org.openqa.selenium.interactions.Actions;
 import org.openqa.selenium.support.ui.ExpectedConditions;
@@ -192,5 +195,17 @@ public class SeleniumUtil {
     public void timeSleep(long seconds) throws InterruptedException {
         long millis = seconds * 1000;
         Thread.sleep(millis);
+    }
+
+    public boolean isExistBtnBySelector(WebDriver driver, String cssSelector, String btnText) {
+        String pageSource = driver.getPageSource();
+        Document doc = Jsoup.parse(pageSource);
+        Elements elements = doc.select(cssSelector);
+        String elementsText = elements.text();
+        if (elementsText.equals(btnText)) {
+            System.out.println(elementsText);
+            return true;
+        }
+        return false;
     }
 }
