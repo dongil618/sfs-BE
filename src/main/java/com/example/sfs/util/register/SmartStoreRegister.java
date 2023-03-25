@@ -36,13 +36,9 @@ public class SmartStoreRegister implements ProductRegister {
         // 바로 상품 등록 url로 접근
         String createProductUrl = "https://sell.smartstore.naver.com/#/products/create";
         driver.get(createProductUrl);
-
-        String pageSource = driver.getPageSource();
-        Document doc = Jsoup.parse(pageSource);
+        seleniumUtil.timeSleep(3);
         String loginSelector = "#root > div > div.Layout_wrap__3uDBh > div > div > h2";
-        Elements loginSectionElements = doc.select(loginSelector);
-        System.out.println(loginSectionElements.text());
-        if(loginSectionElements.text().equals("로그인")) {
+        if(seleniumUtil.isExistBtnBySelector(driver, loginSelector, "로그인")) {
             smartStoreLogin(driver);
             driver.get(createProductUrl);
         }
@@ -91,7 +87,7 @@ public class SmartStoreRegister implements ProductRegister {
             SeleniumUtil seleniumUtil = new SeleniumUtil();
 
             // 네이버아이디로 로그인 버튼 클릭
-            String naverLoginBtnXpath = "//*[@id='root']/div/div[1]/div/div/div[4]/div[1]/ul/li[2]/button";
+            String naverLoginBtnXpath = "//*[@id='root']/div/div[1]/div/div/div[4]/div[1]/ul/li[2]/button/span";
             seleniumUtil.elementClickByXpath(driver, naverLoginBtnXpath);
             seleniumUtil.timeSleep(driver, 5);
 
@@ -152,11 +148,13 @@ public class SmartStoreRegister implements ProductRegister {
         }
         // KC인증 안전기준 팝업창
         seleniumUtil.timeSleep(1);
-        String kcPopUpSelector = "body > div.modal.seller-layer-modal.fade.in > div > div > div.modal-footer > div > button";
-        try {
-            seleniumUtil.executeClickJsBySelector(driver, kcPopUpSelector);
-        } catch (Exception e) {
-            e.printStackTrace();
+        String kcPopUpCloseBtnSelector = "body > div.modal.seller-layer-modal.fade.in > div > div > div.modal-footer > div > button";
+        if(seleniumUtil.isExistBtnBySelector(driver, kcPopUpCloseBtnSelector, "확인")) {
+            try {
+                seleniumUtil.executeClickJsBySelector(driver, kcPopUpCloseBtnSelector);
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
         }
     }
 
