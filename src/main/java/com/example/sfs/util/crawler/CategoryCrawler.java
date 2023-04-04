@@ -16,8 +16,11 @@ import java.util.Map;
 @Component
 public class CategoryCrawler {
     private static String naverShoppingUrl = "https://search.shopping.naver.com/search/all?query=";
-    /*
-    네이버 쇼핑 검색 -> 상위 5개 카테고리 중 가장 많은 것
+
+    /**
+     * 네이버 쇼핑 검색 -> 상위 5개 카테고리 중 가장 많은 것
+     * @param productName
+     * @return
      */
     public String getProductCategory(String productName) {
         Map<String, Integer> productCategoryDict = new HashMap<>();
@@ -32,6 +35,45 @@ public class CategoryCrawler {
                 Elements categoryElements = categoryDiv.getElementsByTag("span");
                 for(Element categoryElement : categoryElements) {
                     productCategory += (categoryElement.text() + "$");
+                }
+                productCategory = productCategory.substring(0, productCategory.length() - 1);
+                productCategoryList.add(productCategory);
+                productCategoryDict = getCountsToDict(productCategoryList);
+            }
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+
+
+        String maxKey = null;
+        for (String key : productCategoryDict.keySet()) {
+            if (maxKey == null || productCategoryDict.get(key) > productCategoryDict.get(maxKey)) {
+                maxKey = key;
+            }
+        }
+        return maxKey;
+    }
+
+    /**
+     * 네이버 쇼핑 검색 -> 상위 5개 카테고리 중 가장 많은 것
+     * 구분자 추가
+     * @param productName
+     * @param separator
+     * @return
+     */
+    public String getProductCategory(String productName, String separator) {
+        Map<String, Integer> productCategoryDict = new HashMap<>();
+        try {
+            String requestUrlPath = naverShoppingUrl + URLEncoder.encode(productName, "UTF-8");
+            Document doc = Jsoup.connect(requestUrlPath).get();
+            Elements categoryDivs = doc.select("div[class=basicList_depth__SbZWF]");
+
+            List<String> productCategoryList = new ArrayList<>();
+            for(Element categoryDiv : categoryDivs){
+                String productCategory = "";
+                Elements categoryElements = categoryDiv.getElementsByTag("span");
+                for(Element categoryElement : categoryElements) {
+                    productCategory += (categoryElement.text() + separator);
                 }
                 productCategory = productCategory.substring(0, productCategory.length() - 1);
                 productCategoryList.add(productCategory);
