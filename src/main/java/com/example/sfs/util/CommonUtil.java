@@ -4,11 +4,13 @@ package com.example.sfs.util;
 import com.example.sfs.config.CommonConfig;
 import com.example.sfs.dto.crawler.ProductDto;
 import com.example.sfs.dto.product.PostRegisterProductRequestDto;
+import org.apache.commons.math3.util.CombinatoricsUtils;
 
 import java.io.*;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Iterator;
 import java.util.List;
 
 public class CommonUtil {
@@ -210,5 +212,59 @@ public class CommonUtil {
             index++;
         }
         return destPathFolder;
+    }
+
+    /**
+     * 리스트 문자열을 받아 중복 제거
+     * @param values
+     * @return
+     */
+    public static List<String> getDeduplication(List<String> values) {
+        List<String> newStringList = new ArrayList<>();
+
+        for(String value : values) {
+            if(!newStringList.contains(value)){
+                newStringList.add(value);
+            }
+        }
+
+        return newStringList;
+    }
+
+    /**
+     * 키워드의 조합 구하기(구현중)
+     * @param keywordList
+     * @return
+     */
+    public static List<String> getKeywordCombination(List<String> keywordList, int r) {
+        int n = keywordList.size();
+        List<String> keywordCombinations = new ArrayList<>();
+
+        Iterator<int[]> iterator = CombinatoricsUtils.combinationsIterator(n, r);
+        while (iterator.hasNext()) {
+            final int[] combinationIndexList = iterator.next();
+
+            List<String> tempKeywordList = new ArrayList<>();
+            for(int idx : combinationIndexList) {
+                tempKeywordList.add(keywordList.get(idx));
+            }
+
+            keywordCombinations.add(String.join(" ", tempKeywordList));
+        }
+
+        return keywordCombinations;
+    }
+
+    /**
+     * 10보다 작은 부등호 "< 10" 를 "0"으로 변경
+     * NaverSearchAdApi 사용시 필요
+     * @param sign
+     * @return
+     */
+    public static String changeSignToZero(String sign) {
+        if(sign.contains("<") || sign.equals("< 10")) {
+            return "0";
+        }
+        return sign;
     }
 }
