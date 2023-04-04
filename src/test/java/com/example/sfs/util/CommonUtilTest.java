@@ -6,6 +6,8 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
 import java.io.IOException;
+import java.util.Arrays;
+import java.util.List;
 
 public class CommonUtilTest {
 
@@ -48,5 +50,31 @@ public class CommonUtilTest {
 
         // then
         Assertions.assertThat(CommonUtil.existFile(destPath)).isTrue();
+    }
+
+    @Test
+    @DisplayName("키워드의 조합 구하기")
+    public void getKeywordCombinationTest() {
+        // given
+        List<String> keywordList = Arrays.asList(new String[]{"페미닌", "리본", "스트랩", "스틸레토", "슬링백", "7cm", "아이보리", "블랙"});
+
+        // when
+        List<String> keywordCombinations = CommonUtil.getKeywordCombination(keywordList, 2);
+
+        // then
+        Assertions.assertThat(keywordCombinations.size()).isEqualTo(28);
+    }
+
+    @Test
+    @DisplayName("10보다 작은 부등호 \"< 10\" 를 \"0\"으로 변경")
+    public void changeSignToZeroTest() {
+        // given
+        String sign = "< 10";
+
+        // when
+        String result = CommonUtil.changeSignToZero(sign);
+
+        // then
+        Assertions.assertThat(result).isEqualTo("0");
     }
 }
