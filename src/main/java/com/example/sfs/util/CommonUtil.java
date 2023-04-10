@@ -12,6 +12,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Iterator;
 import java.util.List;
+import java.util.regex.Pattern;
 
 public class CommonUtil {
 
@@ -267,4 +268,27 @@ public class CommonUtil {
         }
         return sign;
     }
+
+    /**
+     * 문자열과 정규표현식을 받아 true, false 반환 메서드
+     * @param string
+     * @param regexPattern
+     * @return
+     */
+    public static boolean patternMatches(String string, String regexPattern) {
+        return Pattern.compile(regexPattern)
+                .matcher(string)
+                .matches();
+    }
+
+    /**
+     * 이메일을 받아 true, false 반환 메서드
+     * @param email
+     * @return
+     */
+    public static boolean checkEmail(String email) {
+        String regexPattern = "^(.+)@(\\S+)$";
+        return patternMatches(email, regexPattern);
+    }
+
 }
