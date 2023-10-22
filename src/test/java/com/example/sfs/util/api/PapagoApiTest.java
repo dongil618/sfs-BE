@@ -1,7 +1,7 @@
 package com.example.sfs.util.api;
 
+import com.example.sfs.api.PapagoApi;
 import org.assertj.core.api.Assertions;
-import org.json.JSONObject;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 

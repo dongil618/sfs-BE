@@ -2,7 +2,7 @@ package com.example.sfs.util.crawler;
 
 import com.example.sfs.dto.crawler.ProductDto;
 import com.example.sfs.dto.product.PostCrawledProductsRequestDto;
-import com.example.sfs.util.api.PapagoApi;
+import com.example.sfs.api.PapagoApi;
 import lombok.RequiredArgsConstructor;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;

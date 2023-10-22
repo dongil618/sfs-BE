@@ -3,7 +3,7 @@ package com.example.sfs.service;
 import com.example.sfs.dto.api.NaverKeywordDto;
 import com.example.sfs.dto.keyword.KeywordMatchCategoryRequestDto;
 import com.example.sfs.dto.keyword.KeywordMatchCategoryResponseDto;
-import com.example.sfs.util.api.NaverSearchAdApi;
+import com.example.sfs.api.NaverSearchAdApi;
 import com.example.sfs.util.crawler.CategoryCrawler;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import lombok.RequiredArgsConstructor;

@@ -14,6 +14,8 @@ import com.example.sfs.util.register.ProductRegisterStrategyFactory;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
@@ -103,7 +105,7 @@ public class ProductService {
         return new GetProductResponseDto(product);
     }
 
-    public Void registerProduct(Long productId, PostRegisterProductRequestDto postRegisterProductRequestDto) throws Exception {
+    public Void registerProduct(Long productId, PostRegisterProductRequestDto postRegisterProductRequestDto, HttpServletRequest req, HttpServletResponse res) throws Exception {
         /* todo : productId로 조회 후 request와 다른 부분은 DB업데이트 및 상품 등록 진행 */
         ProductRegisterStrategy siteType = postRegisterProductRequestDto.getSiteType();
         if(siteType == null) {
@@ -112,7 +114,7 @@ public class ProductService {
         // Product update => JPA 업데이트 사용법 알아보기
         // 셀레니움으로 상품 등록하기
         ProductRegister productRegisterStrategy = productRegisterStrategyFactory.findStrategy(siteType);
-        productRegisterStrategy.registerProduct(postRegisterProductRequestDto);
+        productRegisterStrategy.registerProduct(postRegisterProductRequestDto, req, res);
         return null;
     }
 }

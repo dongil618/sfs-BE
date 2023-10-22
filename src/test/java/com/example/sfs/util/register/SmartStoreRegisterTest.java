@@ -1,6 +1,25 @@
 package com.example.sfs.util.register;
 
+import com.example.sfs.api.naverCommerce.dto.DeliveryInfo;
+import com.example.sfs.api.naverCommerce.dto.SmartStoreCategory;
+import com.example.sfs.api.naverCommerce.dto.SmartStoreProductResponseDto;
+import com.fasterxml.jackson.core.type.TypeReference;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import org.assertj.core.api.Assertions;
+import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.Test;
+import org.springframework.core.io.ClassPathResource;
+
+import java.io.File;
+import java.io.IOException;
+import java.net.MalformedURLException;
+import java.net.URL;
+import java.net.URLPermission;
+import java.util.Arrays;
+import java.util.List;
+
 public class SmartStoreRegisterTest {
+    private static final ObjectMapper objectMapper = new ObjectMapper();
 //    static WebDriver driver;
 //
 //    @Test
@@ -34,4 +53,66 @@ public class SmartStoreRegisterTest {
 //        SmartStoreRegister smartStoreRegister = new SmartStoreRegister(new SeleniumUtil());
 //        smartStoreRegister.registerProduct(postRegisterProductRequestDto);
 //    }
+
+    @Test
+    @DisplayName("전체 카테고리 조회 후 카테고리 이름에 맞는 카테고리 id 가져오기")
+    public void getCategoryIdByCategoryName() throws IOException {
+
+        // given
+        String targetCategoryName = "패션의류>여성의류>니트/스웨터";
+        ClassPathResource resource = new ClassPathResource("smartstoreAllCategory.json");
+        File file = new File(resource.getURI());
+
+        // when
+        List<SmartStoreCategory> smartStoreCategories = objectMapper.readValue(file, new TypeReference<List<SmartStoreCategory>>() {});
+        String categoryId = null;
+        for(SmartStoreCategory smartStoreCategory : smartStoreCategories) {
+            if(targetCategoryName.equals(smartStoreCategory.getWholeCategoryName())) {
+                categoryId = smartStoreCategory.getId();
+            }
+        }
+
+        // then
+        Assertions.assertThat(categoryId).isEqualTo("50000805");
+    }
+
+    @Test
+    @DisplayName("basicProductInfo.json에서 deliveryInfo 가져오기")
+    public void getDeliveryInfoBybasicProductInfoJson() throws IOException {
+
+        // given
+        ClassPathResource resource = new ClassPathResource("basicProductInfo.json");
+        File file = new File(resource.getURI());
+
+        // when
+        SmartStoreProductResponseDto smartStoreProductResponseDto = objectMapper.readValue(file, new TypeReference<SmartStoreProductResponseDto>() {});
+        DeliveryInfo deliveryInfo = smartStoreProductResponseDto.getOriginProduct().getDeliveryInfo();
+
+        // then
+        Assertions.assertThat(deliveryInfo.getDeliveryCompany()).isEqualTo("CJGLS");
+    }
+
+    @Test
+    @DisplayName("image url 변경")
+    public void changeImageUrl() {
+
+        // given
+        String uploadUrl = "http://shop1.phinf.naver.net/20231019_13/1697711965101DGMkN_JPEG/30446843063267279_1661873359.jpg?type=w860";
+
+        // when
+        String newUrl = "";
+        try {
+            URL url = new URL(uploadUrl);
+            System.out.println(url.getProtocol());
+            System.out.println(url.getHost());
+            System.out.println(url.getPath());
+            System.out.println(url.getQuery());
+            newUrl = "https://shop-phinf.pstatic.net" + url.getPath() + "?" + url.getQuery();
+        } catch (MalformedURLException e) {
+            throw new RuntimeException(e);
+        }
+
+        // then
+        Assertions.assertThat(newUrl).isEqualTo("https://shop-phinf.pstatic.net/20231019_13/1697711965101DGMkN_JPEG/30446843063267279_1661873359.jpg?type=w860");
+    }
 }

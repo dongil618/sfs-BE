@@ -1,6 +1,8 @@
 package com.example.sfs.util.crawler;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import org.jsoup.Jsoup;
+import org.jsoup.nodes.DataNode;
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
 import org.jsoup.select.Elements;
@@ -15,6 +17,8 @@ import java.util.Map;
 
 @Component
 public class CategoryCrawler {
+
+    private static final ObjectMapper objectMapper = new ObjectMapper();
     private static String naverShoppingUrl = "https://search.shopping.naver.com/search/all?query=";
 
     /**
@@ -27,18 +31,31 @@ public class CategoryCrawler {
         try {
             String requestUrlPath = naverShoppingUrl + URLEncoder.encode(productName, "UTF-8");
             Document doc = Jsoup.connect(requestUrlPath).get();
-            Elements categoryDivs = doc.select("div[class=basicList_depth__SbZWF]");
+            Element scriptElement = doc.select("script[id=__NEXT_DATA__]").first();
+            List<DataNode> dataNodeList = scriptElement.dataNodes();
+            String jsonStr = String.valueOf(dataNodeList.get(0));
+
+            Map<String, Object> dataMap = objectMapper.readValue(jsonStr, Map.class);
+            Map<String, Object> props = (Map<String, Object>) dataMap.get("props");
+            Map<String, Object> pageProps = (Map<String, Object>) props.get("pageProps");
+            Map<String, Object> initialState = (Map<String, Object>) pageProps.get("initialState");
+            Map<String, Object> products = (Map<String, Object>) initialState.get("products");
+            List<Map<String, Object>> productList = (List<Map<String, Object>>) products.get("list");
 
             List<String> productCategoryList = new ArrayList<>();
-            for(Element categoryDiv : categoryDivs){
-                String productCategory = "";
-                Elements categoryElements = categoryDiv.getElementsByTag("span");
-                for(Element categoryElement : categoryElements) {
-                    productCategory += (categoryElement.text() + "$");
+            int i = 0;
+            for(Map<String, Object> product : productList) {
+                if(i == 5) {
+                    break;
                 }
-                productCategory = productCategory.substring(0, productCategory.length() - 1);
+                Map<String, Object> item = (Map<String, Object>) product.get("item");
+                String productCategory = item.get("category1Name") + "$"
+                        + item.get("category2Name") + "$"
+                        + item.get("category3Name")
+                        + ((item.get("category4Name") != "") ? "$" + item.get("category4Name") : "");
                 productCategoryList.add(productCategory);
                 productCategoryDict = getCountsToDict(productCategoryList);
+                i++;
             }
         } catch (IOException e) {
             e.printStackTrace();
@@ -66,7 +83,7 @@ public class CategoryCrawler {
         try {
             String requestUrlPath = naverShoppingUrl + URLEncoder.encode(productName, "UTF-8");
             Document doc = Jsoup.connect(requestUrlPath).get();
-            Elements categoryDivs = doc.select("div[class=basicList_depth__SbZWF]");
+            Elements categoryDivs = doc.select("div[class=product_depth__I4SqY]");
 
             List<String> productCategoryList = new ArrayList<>();
             for(Element categoryDiv : categoryDivs){

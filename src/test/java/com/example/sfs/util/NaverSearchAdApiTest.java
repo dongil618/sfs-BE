@@ -1,7 +1,7 @@
 package com.example.sfs.util;
 
 import com.example.sfs.dto.api.NaverKeywordDto;
-import com.example.sfs.util.api.NaverSearchAdApi;
+import com.example.sfs.api.NaverSearchAdApi;
 import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
