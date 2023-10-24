@@ -12,6 +12,8 @@ import org.jsoup.select.Elements;
 import org.openqa.selenium.*;
 import org.springframework.stereotype.Component;
 
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -32,7 +34,7 @@ public class SmartStoreRegister implements ProductRegister {
     }
 
     @Override
-    public void registerProduct(PostRegisterProductRequestDto postRegisterProductRequestDto) throws InterruptedException {
+    public void registerProduct(PostRegisterProductRequestDto postRegisterProductRequestDto, HttpServletRequest req, HttpServletResponse res) throws InterruptedException {
         // 바로 상품 등록 url로 접근
         String createProductUrl = "https://sell.smartstore.naver.com/#/products/create";
         driver.get(createProductUrl);
@@ -59,11 +61,16 @@ public class SmartStoreRegister implements ProductRegister {
             updateSelectOptionList(driver, postRegisterProductRequestDto);
             seleniumUtil.scrollTo(driver, 2300);
             uploadMainImage(driver, postRegisterProductRequestDto);
+            System.out.println("======메인이미지 업로드 완료======");
             seleniumUtil.timeSleep(2);
-            seleniumUtil.scrollTo(driver, 4000);
+            seleniumUtil.scrollTo(driver, 1000);
+            System.out.println("======스크롤 내리기 : 1000======");
             writeDetailPageWithSmartEditorOne(driver, postRegisterProductRequestDto);
+            seleniumUtil.scrollTo(driver, 400);
+            System.out.println("======스크롤 내리기 : 400======");
             inputDeliveryInfo(driver);
             seleniumUtil.scrollTo(driver, 4500);
+            System.out.println("======스크롤 내리기 : 4500======");
             seleniumUtil.timeSleep(1);
             stopDisplay(driver);
             saveRegisterProduct(driver);
@@ -269,7 +276,7 @@ public class SmartStoreRegister implements ProductRegister {
 
     public void writeDetailPageWithSmartEditorOne(WebDriver driver, PostRegisterProductRequestDto postRegisterProductRequestDto) throws InterruptedException {
         // 스마트에디터 One으로 작성 버튼
-        String smartEditorBtnXpath = "//*[@id=\'productForm\']/ng-include/ui-view[13]/div/div[2]/div/div/ncp-editor-form/div[1]/div/p[4]/button";
+        String smartEditorBtnXpath = "//*[@id=\'anchor-detail-content\']/div/div[2]/div/div/ncp-editor-form/div[1]/div/p[4]/button";
         seleniumUtil.elementClickByXpath(driver, smartEditorBtnXpath);
         seleniumUtil.timeSleep( 5);
 
@@ -341,7 +348,7 @@ public class SmartStoreRegister implements ProductRegister {
         String imageXpath = "//*[@id=\'" + divId + "\']/div[1]/div/header/div[1]/ul/li[1]/button";
         String myImageBtnXpath = "/html/body/label/input";
         List<String> detailImageFilePathList = CommonUtil.getDetailImageFilePathList(postRegisterProductRequestDto);
-        seleniumUtil.uploadImageListByXpath(driver, imageXpath, myImageBtnXpath, detailImageFilePathList);
+//        seleniumUtil.uploadImageListByXpath(driver, imageXpath, myImageBtnXpath, detailImageFilePathList);
         seleniumUtil.timeSleep(5);
 
         // 등록버튼 클릭
@@ -355,10 +362,10 @@ public class SmartStoreRegister implements ProductRegister {
     }
 
     public void inputDeliveryInfo(WebDriver driver) throws InterruptedException {
-        String openDeliverySectionBtnXpath = "//*[@id=\'productForm\']/ng-include/ui-view[18]/div[2]/div/div/div/a";
+        String openDeliverySectionBtnXpath = "//*[@id=\'productForm\']/ng-include/ui-view[19]/div[2]/div/div/div/a";
         seleniumUtil.elementClickByXpath(driver, openDeliverySectionBtnXpath);
 
-        String deliveryFeeTemplateBtnXpath = "//*[@id=\'productForm\']/ng-include/ui-view[18]/div[2]/div[2]/div/div[1]/div/div/div[2]/button";
+        String deliveryFeeTemplateBtnXpath = "//*[@id=\'productForm\']/ng-include/ui-view[19]/div[2]/div[2]/div/div[1]/div/div/div[2]/button";
         seleniumUtil.elementClickByXpath(driver, deliveryFeeTemplateBtnXpath);
 
         String basicTemplateSelectBtnCssSelector = "body > div.modal.fade.seller-layer-modal.in > div > div > div.modal-body > div > table > tbody > tr:nth-child(1) > td:nth-child(2) > button";
@@ -366,7 +373,7 @@ public class SmartStoreRegister implements ProductRegister {
     }
 
     public void stopDisplay(WebDriver driver) {
-        String stopDisplayBtnXpath = "//*[@id=\'productForm\']/ng-include/ui-view[24]/div/div[2]/div/div[2]/div/div[2]/ng-include/div/div[3]/div/div/div/label[2]";
+        String stopDisplayBtnXpath = "//*[@id=\'productForm\']/ng-include/ui-view[25]/div/div[2]/div/div[2]/div/div[2]/ng-include/div/div[3]/div/div/div/label[2]";
         seleniumUtil.getPresenceOfElementByXpath(driver, stopDisplayBtnXpath).click();
     }
 

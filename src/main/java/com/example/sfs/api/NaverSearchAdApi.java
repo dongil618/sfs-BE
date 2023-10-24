@@ -1,4 +1,4 @@
-package com.example.sfs.util.api;
+package com.example.sfs.api;
 
 import com.example.sfs.dto.api.NaverKeywordDto;
 import com.example.sfs.util.PropertiesLoader;
