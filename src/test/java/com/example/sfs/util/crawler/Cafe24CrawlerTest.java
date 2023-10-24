@@ -2,15 +2,29 @@ package com.example.sfs.util.crawler;
 
 import com.example.sfs.dto.product.PostCrawledProductsRequestDto;
 import com.example.sfs.dto.crawler.ProductDto;
-import com.example.sfs.util.api.PapagoApi;
+import com.example.sfs.api.PapagoApi;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import org.assertj.core.api.Assertions;
+import org.jsoup.Jsoup;
+import org.jsoup.nodes.DataNode;
+import org.jsoup.nodes.Document;
+import org.jsoup.nodes.Element;
+import org.jsoup.select.Elements;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
+import java.io.IOException;
+import java.net.URLEncoder;
+import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 
 public class Cafe24CrawlerTest {
+
+    private static final ObjectMapper ob = new ObjectMapper();
+
     @Test
     @DisplayName("카페24 여러개 상품 상세페이지에서 상세 정보 한 번에 가져오기")
     public void getProductDetailInfosTest() {
@@ -53,5 +67,57 @@ public class Cafe24CrawlerTest {
 
         // then
         Assertions.assertThat(productDtos.size()).isEqualTo(30);
+    }
+
+    @Test
+    @DisplayName("네이버 쇼핑에서 카테고리 정보 가져오기")
+    public void getCategoryInNaverShopping() throws IOException {
+        // given
+        String requestUrlPath = "https://search.shopping.naver.com/search/all?query=%EC%B9%B4%EA%B3%A0+%EB%AF%B8%EB%8B%88+%EC%8A%A4%EC%BB%A4%ED%8A%B8+%28%EB%B2%A0%EC%9D%B4%EC%A7%80%2C+%EC%88%AF%2C+%EB%B8%94%EB%9E%99%29";
+
+        // when
+        Map<String, Integer> productCategoryDict = new HashMap<>();
+
+        Document doc = Jsoup.connect(requestUrlPath).get();
+        Element scriptElement = doc.select("script[id=__NEXT_DATA__]").first();
+        List<DataNode> dataNodeList = scriptElement.dataNodes();
+        String jsonStr = String.valueOf(dataNodeList.get(0));
+
+        Map<String, Object> dataMap = ob.readValue(jsonStr, Map.class);
+        Map<String, Object> props = (Map<String, Object>) dataMap.get("props");
+        Map<String, Object> pageProps = (Map<String, Object>) props.get("pageProps");
+        Map<String, Object> initialState = (Map<String, Object>) pageProps.get("initialState");
+        Map<String, Object> products = (Map<String, Object>) initialState.get("products");
+        List<Map<String, Object>> productList = (List<Map<String, Object>>) products.get("list");
+
+        List<String> productCategoryList = new ArrayList<>();
+        int i = 0;
+        for(Map<String, Object> product : productList) {
+            if(i == 5) {
+                break;
+            }
+            Map<String, Object> item = (Map<String, Object>) product.get("item");
+            String productCategory = item.get("category1Name") + "$"
+                                    + item.get("category2Name") + "$"
+                                    + item.get("category3Name")
+                                    + ((item.get("category4Name") != "") ? "$" + item.get("category4Name") : "");
+            System.out.println(productCategory);
+            productCategoryList.add(productCategory);
+            productCategoryDict = getCountsToDict(productCategoryList);
+            i++;
+        }
+        System.out.println(productCategoryDict);
+    }
+
+    public Map<String, Integer> getCountsToDict(List<String> stringList) {
+        Map<String, Integer> counts = new HashMap<>();
+        for(String string : stringList) {
+            if (counts.containsKey(string)) {
+                counts.put(string, counts.get(string) + 1);
+            } else {
+                counts.put(string, 1);
+            }
+        }
+        return counts;
     }
 }

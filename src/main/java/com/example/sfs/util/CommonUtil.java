@@ -6,6 +6,7 @@ import com.example.sfs.dto.crawler.ProductDto;
 import com.example.sfs.dto.product.PostRegisterProductRequestDto;
 import org.apache.commons.math3.util.CombinatoricsUtils;
 
+import javax.servlet.http.HttpServletRequest;
 import java.io.*;
 import java.net.URL;
 import java.util.ArrayList;
@@ -136,7 +137,7 @@ public class CommonUtil {
         }
         return detailImageFilePathList;
     }
-
+    
     public static void saveImage(String imageUrl, String fileDestPath) throws IOException {
         URL url = null;
         InputStream in = null;
@@ -291,4 +292,35 @@ public class CommonUtil {
         return patternMatches(email, regexPattern);
     }
 
+    /**
+     * 타켓 key의 쿠키 value 가져오기
+     * @param req
+     * @param targetKey
+     * @return
+     */
+    public String getCookie(HttpServletRequest req, String targetKey){
+        javax.servlet.http.Cookie[] cookies = req.getCookies(); // 모든 쿠키 가져오기
+        if(cookies != null){
+            for (javax.servlet.http.Cookie c : cookies) {
+                String name = c.getName();
+                String value = c.getValue();
+                if (name.equals(targetKey)) {
+                    return value;
+                }
+            }
+        }
+        return null;
+    }
+
+    public List<File> getImageFiles(List<String> imagePaths) {
+        List<File> images = new ArrayList<>();
+        for(String imagePath : imagePaths) {
+            images.add(new File(imagePath));
+        }
+        return images;
+    }
+
+    public File getImageFile(String imagePath) {
+        return new File(imagePath);
+    }
 }

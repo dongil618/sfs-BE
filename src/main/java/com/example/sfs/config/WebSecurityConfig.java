@@ -50,6 +50,8 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
                     "/h2-console/**",
                     "/api/auth/sign-up",
                     "/api/auth/sign-in",
+                    "/api/test/token",
+                    "/api/test/smartStoreProduct/**",
                     "/api/**"
             );
     }
@@ -89,6 +91,7 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
                 .authorizeRequests()
                 .antMatchers("/images/**").permitAll()
                 .antMatchers("/api/auth/**").permitAll()
+                .antMatchers("/api/test/**").permitAll()
                 .anyRequest().authenticated()
 
                 .and()
